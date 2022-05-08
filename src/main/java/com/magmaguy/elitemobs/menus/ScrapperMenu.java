@@ -6,6 +6,7 @@ import com.magmaguy.elitemobs.config.ItemSettingsConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.config.menus.premade.ScrapperMenuConfig;
 import com.magmaguy.elitemobs.config.menus.premade.SellMenuConfig;
+import com.magmaguy.elitemobs.items.ItemTagger;
 import com.magmaguy.elitemobs.items.ItemTierFinder;
 import com.magmaguy.elitemobs.items.customenchantments.SoulbindEnchantment;
 import com.magmaguy.elitemobs.items.itemconstructor.ItemConstructor;
@@ -105,6 +106,12 @@ public class ScrapperMenu extends EliteMenu {
                     player.sendMessage(ChatColorConverter.convert(TranslationConfig.getShopSaleOthersItems()));
                     return;
                 }
+
+                //If the item is already scrap, prevent re-processing
+                if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), "EliteScrap")) return;
+
+                //If item is upgrade orb, block processing
+                if (ItemTagger.hasEnchantment(currentItem.getItemMeta(), "EliteUpgradeItem")) return;
 
                 //Do transfer
                 for (int slot : ScrapperMenuConfig.storeSlots)
