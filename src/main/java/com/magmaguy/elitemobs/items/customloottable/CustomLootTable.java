@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CustomLootTable implements Serializable {
 
@@ -73,6 +74,23 @@ public class CustomLootTable implements Serializable {
         }
     }
 
+    public CustomLootEntry getWeightedRandomLoot(Player player) {
+        List<CustomLootEntry> potentialLoot = entries.stream().filter(
+                lootEntry -> lootEntry.getChance() < 1.0 ||
+                (!lootEntry.getPermission().isEmpty() && player.hasPermission(lootEntry.getPermission()))
+        ).toList();
+        double lootRoll = ThreadLocalRandom.current().nextDouble(
+                potentialLoot.stream().mapToDouble(CustomLootEntry::getChance).sum()
+        );
+        double lootWeightThreshold = 0;
+        for (CustomLootEntry customLootEntry : potentialLoot) {
+            lootWeightThreshold += customLootEntry.getChance();
+            if (lootRoll < lootWeightThreshold)
+                return customLootEntry;
+        }
+        throw new ArithmeticException("An error occurred while calculating a weighted random loot selection");
+    }
+
     public void generateCurrencyEntry(int currencyAmount) {
         new CurrencyCustomLootEntry(entries, currencyAmount);
     }
@@ -91,14 +109,16 @@ public class CustomLootTable implements Serializable {
     }
 
     public void treasureChestDrop(Player player, int chestLevel, Location dropLocation) {
-        for (CustomLootEntry customLootEntry : entries)
-            if (customLootEntry.willDrop(player)) {
+        CustomLootEntry guaranteedDropLootEntry = getWeightedRandomLoot(player);
+        for (CustomLootEntry customLootEntry : entries) {
+            if (customLootEntry.willDrop(player) || customLootEntry.equals(guaranteedDropLootEntry)) {
                 if (ItemSettingsConfig.isPutLootDirectlyIntoPlayerInventory()) {
                     customLootEntry.directDrop(chestLevel * 10, player);
-                }else{
+                } else {
                     customLootEntry.locationDrop(chestLevel * 10, player, dropLocation);
                 }
             }
+        }
     }
 
     public void questDrop(Player player, int questRewardLevel) {
