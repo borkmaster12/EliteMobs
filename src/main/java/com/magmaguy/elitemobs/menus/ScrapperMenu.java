@@ -137,12 +137,14 @@ public class ScrapperMenu extends EliteMenu {
                             continue;
                         int tier = ItemTierFinder.findBattleTier(itemStack);
                         for (int i = 0; i < itemStack.getAmount(); i++) {
-                            if (ThreadLocalRandom.current().nextDouble() > .75) {
-                                player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapFailedMessage()));
-                                continue;
+                            if (ThreadLocalRandom.current().nextDouble() < 0.97) {
+                                ItemStack scrap = ItemConstructor.constructScrapItem(tier, player, false);
+                                //Random amount of scrap between 1 and 3, favoring 1
+                                scrap.setAmount((int)(Math.pow(ThreadLocalRandom.current().nextDouble(), 2)) * 3 + 1);
+                                player.getInventory().addItem(scrap);
+                            } else {
+                                player.getInventory().addItem(ItemConstructor.constructUpgradeItem(tier, player, false));
                             }
-                            player.getInventory().addItem(ItemConstructor.constructScrapItem(tier, player, false));
-                            player.sendMessage(ChatColorConverter.convert(ItemSettingsConfig.getScrapSucceededMessage()));
                         }
                         itemStack.setAmount(0);
                     }
