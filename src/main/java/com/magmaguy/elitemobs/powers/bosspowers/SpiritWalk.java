@@ -213,11 +213,11 @@ public class SpiritWalk extends BossPower implements Listener {
 
                 for (int i = 0; i < 20; i++) {
 
-                    double randomizedX = (ThreadLocalRandom.current().nextDouble() - 0.5) * 5;
+                    double randomizedX = (ThreadLocalRandom.current().nextDouble() - 0.5) * 4;
                     double randomizedY = ThreadLocalRandom.current().nextDouble() - 0.5;
-                    double randomizedZ = (ThreadLocalRandom.current().nextDouble() - 0.5) * 5;
+                    double randomizedZ = (ThreadLocalRandom.current().nextDouble() - 0.5) * 4;
 
-                    Vector normalizedVector = new Vector(randomizedX, randomizedY, randomizedZ).normalize().multiply(7).multiply(counter);
+                    Vector normalizedVector = new Vector(randomizedX, randomizedY, randomizedZ).normalize().multiply(10);
 
                     Location newSimulatedLocation = bossLocation.add(normalizedVector).clone();
 
