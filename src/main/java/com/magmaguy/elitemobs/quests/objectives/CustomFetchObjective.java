@@ -119,13 +119,14 @@ public class CustomFetchObjective extends Objective {
                 if (objective instanceof CustomFetchObjective)
                     ((CustomFetchObjective) objective).strictCheck(event.getPlayer(), 0);
         }
-
+        
         @EventHandler(ignoreCancelled = true)
         public void onQuestCompleteEvent(QuestCompleteEvent event) {
-            for (Objective objective : event.getQuest().getQuestObjectives().getObjectives())
+            QuestObjectives questObjectives = event.getQuest().getQuestObjectives();
+            for (Objective objective : questObjectives.getObjectives())
                 if (objective instanceof CustomFetchObjective) {
                     ((CustomFetchObjective) objective).checkProgress(event.getPlayer(), event.getQuest().getQuestObjectives(), 0);
-                    if (objective.getCurrentAmount() < objective.getTargetAmount())
+                    if (objective.getCurrentAmount() < objective.getTargetAmount() && !questObjectives.isForceOver())
                         event.setCancelled(true);
                 }
         }

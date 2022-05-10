@@ -36,6 +36,7 @@ public class QuestObjectives implements Serializable {
     @Getter
     @Setter
     private boolean turnedIn = false;
+    @Getter
     @Setter
     private boolean forceOver = false;
 
