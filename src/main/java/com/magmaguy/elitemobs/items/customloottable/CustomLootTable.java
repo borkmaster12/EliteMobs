@@ -5,6 +5,7 @@ import com.magmaguy.elitemobs.config.customarenas.CustomArenasConfigFields;
 import com.magmaguy.elitemobs.config.custombosses.CustomBossesConfigFields;
 import com.magmaguy.elitemobs.config.customquests.CustomQuestsConfigFields;
 import com.magmaguy.elitemobs.config.customtreasurechests.CustomTreasureChestConfigFields;
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import com.magmaguy.elitemobs.mobconstructor.EliteEntity;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -79,6 +80,7 @@ public class CustomLootTable implements Serializable {
                 lootEntry -> lootEntry.getChance() < 1.0 ||
                 (!lootEntry.getPermission().isEmpty() && player.hasPermission(lootEntry.getPermission()))
         ).toList();
+        if (potentialLoot.isEmpty()) return null;
         double lootRoll = ThreadLocalRandom.current().nextDouble(
                 potentialLoot.stream().mapToDouble(CustomLootEntry::getChance).sum()
         );
