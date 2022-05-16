@@ -42,6 +42,10 @@ public class LootTables implements Listener {
     private static boolean scalableItemsExist;
 
     public static void generatePlayerLoot(EliteEntity eliteEntity) {
+        generatePlayerLoot(eliteEntity, 0.0);
+    }
+
+    public static void generatePlayerLoot(EliteEntity eliteEntity, double dropChanceBonus) {
         if (eliteEntity.isTriggeredAntiExploit()) return;
         for (Player player : eliteEntity.getDamagers().keySet()) {
 
@@ -65,7 +69,7 @@ public class LootTables implements Listener {
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 20 * 10L);
                 }
-                generateLoot((int) Math.floor(itemTier), eliteEntity, player);
+                generateLoot((int) Math.floor(itemTier), eliteEntity, player, dropChanceBonus);
             } else generateLoot(eliteEntity, player);
         }
     }
@@ -93,17 +97,20 @@ public class LootTables implements Listener {
 
     }
 
-    public static ItemStack generateLoot(int itemTier, EliteEntity eliteEntity, Player player) {
+    private static ItemStack generateLoot(int itemTier, EliteEntity eliteEntity, Player player) {
+        return generateLoot(itemTier, eliteEntity, player, 0.0);
+    }
 
+    public static ItemStack generateLoot(int itemTier, EliteEntity eliteEntity, Player player, double dropChanceBonus) {
          /*
         Handle the odds of an item dropping
          */
         double baseChance = ItemSettingsConfig.getFlatDropRate();
         if (eliteEntity instanceof RegionalBossEntity)
             baseChance = ItemSettingsConfig.getRegionalBossNonUniqueDropRate();
-        double dropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemTier;
+        double tierDropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemTier;
 
-        if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus) return null;
+        if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus + tierDropChanceBonus) return null;
 
         HashMap<String, Double> weightedProbability = new HashMap<>();
         if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
