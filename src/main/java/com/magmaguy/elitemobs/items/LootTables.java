@@ -111,12 +111,13 @@ public class LootTables implements Listener {
         double tierDropChanceBonus = ItemSettingsConfig.getTierIncreaseDropRate() * itemTier;
 
         if (ThreadLocalRandom.current().nextDouble() > baseChance + dropChanceBonus + tierDropChanceBonus) return null;
+        int adjustedItemTier = (int)((Math.pow(ThreadLocalRandom.current().nextDouble(), 2)) * 5 + itemTier);
 
         HashMap<String, Double> weightedProbability = new HashMap<>();
         if (proceduralItemsOn) weightedProbability.put("procedural", ItemSettingsConfig.getProceduralItemWeight());
         if (customItemsOn) {
             if (weighedItemsExist) weightedProbability.put("weighed", ItemSettingsConfig.getWeighedItemWeight());
-            if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(itemTier))
+            if (fixedItemsExist) if (CustomItem.getFixedItems().containsKey(adjustedItemTier))
                 weightedProbability.put("fixed", ItemSettingsConfig.getFixedItemWeight());
             if (limitedItemsExist) weightedProbability.put("limited", ItemSettingsConfig.getLimitedItemWeight());
             if (scalableItemsExist) weightedProbability.put("scalable", ItemSettingsConfig.getScalableItemWeight());
@@ -131,15 +132,15 @@ public class LootTables implements Listener {
 
         switch (selectedLootSystem) {
             case "procedural":
-                return dropProcedurallyGeneratedItem(itemTier, eliteEntity, player);
+                return dropProcedurallyGeneratedItem(adjustedItemTier, eliteEntity, player);
             case "weighed":
                 return dropWeighedFixedItem(eliteEntity, player);
             case "fixed":
-                return dropFixedItem(eliteEntity, itemTier, player);
+                return dropFixedItem(eliteEntity, adjustedItemTier, player);
             case "limited":
-                return dropLimitedItem(eliteEntity, itemTier, player);
+                return dropLimitedItem(eliteEntity, adjustedItemTier, player);
             case "scalable":
-                return dropScalableItem(eliteEntity, itemTier, player);
+                return dropScalableItem(eliteEntity, adjustedItemTier, player);
         }
 
         return null;
